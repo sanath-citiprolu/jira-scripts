@@ -1,0 +1,42 @@
+import groovy.json.JsonOutput
+import groovyx.net.http.RESTClient
+import groovyx.net.http.HttpResponseException
+import com.atlassian.jira.component.ComponentAccessor
+import com.atlassian.jira.user.ApplicationUser
+
+
+@Grab(group='org.codehaus.groovy.modules.http-builder', module='http-builder', version='0.7.1')
+def issuetype = issue.issueType.name
+if(issuetype == 'Issue Type Name'){
+      
+      def summary = issue.summary
+      def key = issue.key
+      def status = issue.status.name
+      def labels = issue.labels
+      def json = JsonOutput.toJson([
+                                        "jira_ticket": "$key", 
+                                        "summary": "$summary",
+                                        "status" : "$status"
+]) 
+
+def jsonString = json.toString()
+def endpontUrl = "https://jira-some-url"
+def client = new RESTClient(endpontUrl)
+
+ApplicationUser user = ComponentAccessor.jiraAuthenticationContext.loggedInUser
+
+def headers_map = [:]
+headers_map["Jira-Secret-Token"] = "xxxxxxxxxxxxx"
+try {
+    client.post(
+        headers: headers_map,
+        contentType: 'application/json',
+        body: jsonString
+    )
+}
+catch(HttpResponseException e) {
+    def commentManager = ComponentAccessor.getCommentManager()
+   commentManager.create(issue, user, "Failed to send json", true)
+    throw e
+}
+}
