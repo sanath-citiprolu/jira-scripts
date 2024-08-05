@@ -20,8 +20,8 @@ if(issuetype == 'Issue Type Name'){
 ]) 
 
 def jsonString = json.toString()
-def endpontUrl = "https://jira-some-url"
-def client = new RESTClient(endpontUrl)
+def endpointUrl = "https://jira-some-url"
+def client = new RESTClient(endpointUrl)
 
 ApplicationUser user = ComponentAccessor.jiraAuthenticationContext.loggedInUser
 
